@@ -8,6 +8,7 @@ const morgan = require('morgan');
 const connectDB = require('./db/connect');
 const notFoundMiddleware = require('./middleware/not-found');
 const errorHandlerMiddleware = require('./middleware/error-handler');
+const authRouter = require('./routes/authRoutes');
 
 const app = express();
 const port = process.env.PORT;
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan('tiny'));
 
+app.use('/api/v1/auth', authRouter);
 app.get('/', (req, res)=>{
     res.send('E-commerce API');
 });
