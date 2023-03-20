@@ -60,7 +60,11 @@ const login = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-    res.send('Logout');
+    res.cookie('token', '', {
+        expires: new Date(Date.now()),
+        httpOnly: true
+    });
+    res.status(StatusCodes.OK).send();
 };
 
 module.exports = {
