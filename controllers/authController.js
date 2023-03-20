@@ -1,5 +1,5 @@
 const { StatusCodes } = require('http-status-codes');
-const { BadRequestError } = require('../errors');
+const { BadRequestError, UnauthorizedError } = require('../errors');
 const User = require('../models/User');
 const { attachCookiesToResponse } = require('../utils');
 
@@ -30,7 +30,33 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-    res.send('Login');
+    const { email, password } = req.body;
+
+    if(!email || !password){
+        throw new BadRequestError('Please provide email and password');
+    }
+
+    const user = await User.findOne({ email });
+
+    if(!user){
+        throw new UnauthorizedError('Invalid Credentials');
+    }
+
+    const isPasswordCorrect = await user.comparePassword(password);
+
+    if(!isPasswordCorrect){
+        throw new UnauthorizedError('Invalid Credentials');
+    }
+
+    const tokenUser = {
+        userId: user._id,
+        email,
+        name: user.name,
+    }
+
+    attachCookiesToResponse({res, user: tokenUser});
+
+    res.status(StatusCodes.OK).json({user: tokenUser});
 };
 
 const logout = async (req, res) => {
