@@ -23,7 +23,8 @@ app.use(cookieParser(process.env.JWT_SECRET));
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
 app.get('/', (req, res)=>{
-    res.send('E-commerce API');
+
+    res.send("E-Commerce API");
 });
 
 app.use(notFoundMiddleware);
