@@ -5,9 +5,9 @@ const { getSingleUser, updateUserPassword, updateUser, showCurrentUser, getAllUs
 const router = express.Router();
 
 router.get('/', authenticateUser, authorizePermissions('admin'), getAllUsers);
-router.get('/showMe', showCurrentUser);
+router.get('/showMe', authenticateUser, showCurrentUser);
 router.patch('/updateUser', updateUser);
-router.patch('/updatePassword', updateUserPassword);
+router.patch('/updatePassword', authenticateUser, updateUserPassword);
 router.get('/:id', getSingleUser);
 
 module.exports = router;
