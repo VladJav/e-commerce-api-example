@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const { StatusCodes } = require('http-status-codes');
 const { NotFoundError, BadRequestError, UnauthenticatedError} = require('../errors');
+const {attachCookiesToResponse, createTokenUser} = require("../utils");
 
 const getAllUsers = async ( req, res ) => {
     const users = await User.find({role:"user"}).select('-password');
@@ -16,8 +17,19 @@ const getSingleUser = async ( req, res ) => {
     res.status(StatusCodes.OK).json({user});
 };
 
-const updateUser = ( req, res ) => {
-    res.send('UPDATE USER');
+const updateUser = async ( req, res ) => {
+    const { name, email } = req.body;
+    const { userId } = req.user;
+
+    if(!name || !email){
+        throw new BadRequestError('Provide name and email');
+    }
+
+    const user = await User.findByIdAndUpdate(userId, {name, email}, {runValidators: true, new: true});
+    const tokenUser = createTokenUser(user);
+    attachCookiesToResponse({res, user: tokenUser});
+
+    res.status(StatusCodes.OK).json(tokenUser);
 };
 
 const showCurrentUser = ( req, res ) => {
