@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const { StatusCodes } = require('http-status-codes');
 const { NotFoundError, BadRequestError, UnauthenticatedError} = require('../errors');
-const {attachCookiesToResponse, createTokenUser} = require("../utils");
+const {attachCookiesToResponse, createTokenUser, checkPermissions} = require("../utils");
 
 const getAllUsers = async ( req, res ) => {
     const users = await User.find({role:"user"}).select('-password');
@@ -11,9 +11,13 @@ const getAllUsers = async ( req, res ) => {
 const getSingleUser = async ( req, res ) => {
     const { id } = req.params;
     const user = await User.findById(id).select('-password');
+
     if(!user){
         throw new NotFoundError(`User with id: ${id} does not exists`);
     }
+
+    checkPermissions(req.user, user._id);
+
     res.status(StatusCodes.OK).json({user});
 };
 
