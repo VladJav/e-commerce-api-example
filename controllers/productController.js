@@ -1,7 +1,7 @@
 const { StatusCodes } = require('http-status-codes');
 const Product = require('../models/Product');
-const { NotFoundError } = require('../errors');
-const {raw} = require("express");
+const { NotFoundError, BadRequestError } = require('../errors');
+const path = require("path");
 
 const createProduct = async (req, res) => {
     req.body.user = req.user.userId;
@@ -55,8 +55,22 @@ const deleteProduct = async (req, res) => {
     res.status(StatusCodes.OK).json({msg: 'Product Removed'});
 };
 
-const uploadImage = (req, res) => {
-    res.send('Upload Image');
+const uploadImage = async (req, res) => {
+    if(!req.files.image){
+        throw new BadRequestError('No File Upload');
+    }
+
+    const productImage = req.files.image;
+    const maxSize = 1024*1024;
+
+    if(!productImage.mimetype.startsWith('image') || productImage.size > maxSize){
+        throw new BadRequestError('Bad Image Upload');
+    }
+
+    const imagePath = path.join(__dirname, `../public/uploads/${productImage.name}`);
+    await productImage.mv(imagePath);
+
+    res.status(StatusCodes.OK).json({image: `/uploads/${productImage.name}`});
 };
 
 module.exports = {

@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const fileUpload = require('express-fileupload');
 
 const connectDB = require('./db/connect');
 const notFoundMiddleware = require('./middleware/not-found');
@@ -20,6 +21,9 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan('tiny'));
 app.use(cookieParser(process.env.JWT_SECRET));
+app.use(fileUpload());
+
+app.use(express.static('./public'));
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
