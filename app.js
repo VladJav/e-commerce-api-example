@@ -16,7 +16,7 @@ const productRouter = require('./routes/productRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 8000;
 
 app.use(express.json());
 app.use(cors());
