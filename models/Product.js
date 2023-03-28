@@ -69,4 +69,13 @@ productSchema.virtual('reviews', {
     justOne: false,
 });
 
+productSchema.pre(
+    'deleteOne',
+    { document: true, query: false },
+    async function() {
+        console.log("hs")
+        await this.model('Review').deleteMany({ product: this._id });
+    }
+);
+
 module.exports = mongoose.model('Product', productSchema);

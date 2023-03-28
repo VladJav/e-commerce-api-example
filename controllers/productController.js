@@ -50,7 +50,7 @@ const deleteProduct = async (req, res) => {
     if(!product){
         throw new NotFoundError(`Product with ${productId} does not exists`);
     }
-    await Product.deleteOne({_id:productId});
+    await product.deleteOne();
 
     res.status(StatusCodes.OK).json({msg: 'Product Removed'});
 };
