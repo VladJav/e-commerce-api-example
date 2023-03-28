@@ -3,6 +3,7 @@ const Review = require('../models/Review');
 const Product = require('../models/Product');
 const {NotFoundError, BadRequestError} = require("../errors");
 const {checkPermissions} = require("../utils");
+const {raw} = require("express");
 
 const createReview = async (req, res) => {
     const { product: productId } = req.body;
@@ -29,7 +30,7 @@ const createReview = async (req, res) => {
 };
 
 const getAllReviews = async (req, res) => {
-    const reviews = await Review.find({});
+    const reviews = await Review.find({}).populate({path:'product', select: '_id name price company'});
     res.status(StatusCodes.OK).json({reviews, count: reviews.length});
 };
 
@@ -80,7 +81,16 @@ const deleteReview = async (req, res) => {
     res.json(StatusCodes.OK).send();
 };
 
+const getSingleProductReviews = async (req, res) => {
+    const { productId } = req.params;
+    const reviews = await Review.find({product: productId});
+
+    res.status(StatusCodes.OK).json({reviews, count: reviews.length});
+
+}
+
 module.exports = {
+    getSingleProductReviews,
     createReview,
     getAllReviews,
     getSingleReview,

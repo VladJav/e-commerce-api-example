@@ -8,6 +8,7 @@ const {
     getAllProducts
 } = require('../controllers/productController');
 const { authenticateUser, authorizePermissions } = require('../middleware/authentication');
+const { getSingleProductReviews } = require('../controllers/reviewController');
 
 const router = express.Router();
 
@@ -17,5 +18,6 @@ router.post('/uploadImage', authenticateUser, authorizePermissions('admin'), upl
 router.get('/:productId', getSingleProduct);
 router.delete('/:productId', authenticateUser, authorizePermissions('admin'), deleteProduct);
 router.patch('/:productId', authenticateUser, authorizePermissions('admin'), updateProduct);
+router.get('/:productId/reviews', getSingleProductReviews);
 
 module.exports = router;
