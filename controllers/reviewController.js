@@ -47,7 +47,6 @@ const getSingleReview = async (req, res) => {
 
 const updateReview = async (req, res) => {
     const { reviewId } = req.params;
-    console.log(reviewId)
     const { rating, title, comment } = req.body;
 
     const review = await Review.findById(reviewId);
