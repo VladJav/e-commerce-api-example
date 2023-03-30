@@ -47,6 +47,7 @@ const getSingleReview = async (req, res) => {
 
 const updateReview = async (req, res) => {
     const { reviewId } = req.params;
+    console.log(reviewId)
     const { rating, title, comment } = req.body;
 
     const review = await Review.findById(reviewId);
@@ -78,7 +79,7 @@ const deleteReview = async (req, res) => {
     checkPermissions(req.user, review.user);
 
     await review.deleteOne();
-    res.json(StatusCodes.OK).send();
+    res.json(StatusCodes.OK);
 };
 
 const getSingleProductReviews = async (req, res) => {
