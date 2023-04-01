@@ -11,12 +11,23 @@ const fakeStripeAPI = async ({amount, currency}) =>{
         amount
     }
 }
-const getAllOrders = (req, res) =>{
-    res.send('Get All Orders');
+const getAllOrders = async (req, res) =>{
+    const orders = await Order.find({});
+
+    res.status(StatusCodes.OK).json({orders});
 };
 
-const getSingleOrder = (req, res) =>{
-    res.send('Get Single Order');
+const getSingleOrder = async (req, res) =>{
+    const { orderId } = req.params;
+    const order = await Order.findById(orderId);
+    if(!order){
+        throw new NotFoundError(`No order with id ${orderId}`);
+    }
+
+    checkPermissions(req.user, order.user);
+
+
+    res.status(StatusCodes.OK).json({order});
 };
 
 const getCurrentUserOrders = (req, res) =>{
