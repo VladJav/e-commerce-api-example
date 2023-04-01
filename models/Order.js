@@ -41,7 +41,7 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
-    cartItems: [singleCartItems],
+    cartItems:  [singleCartItems],
     status:{
         type: String,
         enum: ['pending', 'failed', 'paid', 'delivered', 'canceled'],
@@ -54,10 +54,6 @@ const orderSchema = new mongoose.Schema({
     },
     clientSecret:{
         type:String,
-        required: true,
-    },
-    paymentIntentId:{
-        type: String,
         required: true,
     },
 }, { timestamps: true });

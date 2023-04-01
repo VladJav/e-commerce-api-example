@@ -1,5 +1,16 @@
+const { StatusCodes } = require('http-status-codes');
 const Order = require('../models/Order');
+const Product = require('../models/Product');
+const {NotFoundError, BadRequestError} = require("../errors");
+const {checkPermissions} = require("../utils");
 
+const fakeStripeAPI = async ({amount, currency}) =>{
+    const clientSecret = 'random';
+    return {
+        clientSecret,
+        amount
+    }
+}
 const getAllOrders = (req, res) =>{
     res.send('Get All Orders');
 };
@@ -12,8 +23,58 @@ const getCurrentUserOrders = (req, res) =>{
     res.send('Get Current User Orders');
 };
 
-const createOrder = (req, res) =>{
-    res.send('Create Order');
+const createOrder = async (req, res) => {
+    const { items: cartItems, tax, shippingFee } = req.body;
+
+    if(!cartItems || !cartItems.length){
+        throw new BadRequestError('No Cart items provided');
+    }
+    if(!tax || !shippingFee){
+        throw new BadRequestError('Please provide tax and shipping fee');
+    }
+
+    const orderItems = [];
+    let subTotal = 0;
+
+    for(const item of cartItems){
+        const dbProduct = await Product.findById(item.product);
+        if(!dbProduct){
+            throw new NotFoundError(`No product with id ${item.product}`);
+        }
+
+        const { name, price, image } = dbProduct;
+        const singleOrderItem = {
+            amount: item.amount,
+            name,
+            price,
+            image,
+            product: item.product,
+        };
+
+        orderItems.push(singleOrderItem);
+        subTotal += item.amount * price;
+    }
+
+    const totalPrice = tax + shippingFee + subTotal;
+
+    // fake payment
+    const paymentIntent = await fakeStripeAPI({
+        amount:totalPrice,
+        currency: 'usd',
+    });
+
+    const order = await Order.create({
+        cartItems: orderItems,
+        total: totalPrice,
+        subTotal,
+        tax,
+        shippingFee,
+        clientSecret: paymentIntent.clientSecret,
+        user: req.user.userId ,
+
+
+    });
+    res.status(StatusCodes.CREATED).json({ order, clientSecret: order.clientSecret });
 };
 
 const updateOrder = (req, res) =>{
