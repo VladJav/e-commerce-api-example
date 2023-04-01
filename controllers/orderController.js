@@ -85,14 +85,27 @@ const createOrder = async (req, res) => {
         shippingFee,
         clientSecret: paymentIntent.clientSecret,
         user: req.user.userId ,
-
-
     });
     res.status(StatusCodes.CREATED).json({ order, clientSecret: order.clientSecret });
 };
 
-const updateOrder = (req, res) =>{
-    res.send('Update Order');
+const updateOrder = async (req, res) => {
+    const { orderId } = req.params;
+    const { paymentIntentId } = req.body;
+
+    const order = await Order.findById(orderId);
+
+    if(!order){
+        throw new NotFoundError(`No order with id ${orderId}`);
+    }
+
+    checkPermissions(req.user, order.user);
+
+    order.paymentIntentId = paymentIntentId;
+    order.status = 'paid';
+
+    await order.save();
+    res.status(StatusCodes.OK).json({order});
 };
 
 module.exports = {

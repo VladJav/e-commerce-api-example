@@ -56,6 +56,9 @@ const orderSchema = new mongoose.Schema({
         type:String,
         required: true,
     },
+    paymentIntentId:{
+        type: String,
+    },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Order', orderSchema);
