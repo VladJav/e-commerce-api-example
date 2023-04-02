@@ -6,6 +6,8 @@ const cors = require('cors');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
+const rateLimit = require('express-rate-limit')
+const helmet = require('helmet');
 
 const connectDB = require('./db/connect');
 const notFoundMiddleware = require('./middleware/not-found');
@@ -20,6 +22,13 @@ const orderRouter = require('./routes/orderRoutes');
 const app = express();
 const port = process.env.PORT || 8000;
 
+app.use(rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false
+}))
+app.use(helmet());
 app.use(express.json());
 app.use(cors());
 app.use(morgan('tiny'));
